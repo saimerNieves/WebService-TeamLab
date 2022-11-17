@@ -1,26 +1,12 @@
 <?php
 
+include 'API_Functions.php';
+
 $APIFoodFetchURL = 'https://localhost:5001/api/Food';
+$APIOrderPostURL = "https://localhost:5001/api/Order";
 
-//Initialize Curl Instance
-$curl_Instance =curl_init();
 
-//Set Curl Headers/Request
-curl_setopt($curl_Instance, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-curl_setopt($curl_Instance, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl_Instance, CURLOPT_URL, $APIFoodFetchURL);
-curl_setopt($curl_Instance, CURLOPT_FOLLOWLOCATION, true);
-curl_setopt($curl_Instance, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json'));
-curl_setopt($curl_Instance, CURLOPT_VERBOSE, true);
-curl_setopt($curl_Instance, CURLOPT_SSL_VERIFYHOST, false);
-curl_setopt($curl_Instance, CURLOPT_SSL_VERIFYPEER, false);
-
-//Get response Data and Parse from String to JSON
-$GET_requestFoodData = json_decode(curl_exec($curl_Instance), true) ;
-
-//Close Curl Instance
-curl_close($curl_Instance);
-
+$GET_requestFoodData = GET_CurlAPIRequest($APIFoodFetchURL);
 
 //POST Button request
 if(isset($_POST["submitOrder"])){
@@ -35,73 +21,16 @@ if(isset($_POST["submitOrder"])){
   // echo "input_menuItem: ". $input_menuItem ."<br>";
   // echo "input_quantity: ". $input_quantity ."<br>";
 
-}
+  $dataToPost = [
+    "orderName" => $input_orderName,
+    "FoodID" => $input_menuItem,
+    "Quantity"=>  $input_quantity
+  ];
 
 
-  //POST REQUEST 
-  class Log {
-    public static function debug($str) {
-        print "DEBUG: " . $str . "\n";
-    }
-    public static function info($str) {
-        print "INFO: " . $str . "\n";
-    }
-    public static function error($str) {
-        print "ERROR: " . $str . "\n";
-    }
-}
+  $postResults = POST_CurlAPIRequest($APIOrderPostURL, $dataToPost);
+  // var_dump($postResults);
 
-function Curl($APIFoodFetchURL, $post_data, &$http_status, &$header = null) {
-      Log::debug("Curl $APIFoodFetchURL JsonData=" . $post_data);
-
-      $curl_Instance=curl_init();
-      curl_setopt($curl_Instance, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($curl_Instance, CURLOPT_URL, $APIFoodFetchURL);
-      // post_data
-      curl_setopt($curl_Instance, CURLOPT_POST, true);
-      curl_setopt($curl_Instance, CURLOPT_POSTFIELDS, $post_data);
-      if (!is_null($header)) {
-          curl_setopt($curl_Instance, CURLOPT_HEADER, true);
-      curl_setopt($curl_Instance, CURLOPT_FOLLOWLOCATION, true);
-      curl_setopt($curl_Instance, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json'));
-      curl_setopt($curl_Instance, CURLOPT_VERBOSE, true);
-      curl_setopt($curl_Instance, CURLOPT_SSL_VERIFYHOST, false);
-      curl_setopt($curl_Instance, CURLOPT_SSL_VERIFYPEER, false);
-
-      $response = curl_exec($curl_Instance);
-      Log::debug('Curl exec=' . $APIFoodFetchURL);
-        
-      $body = null;
-      // error
-      if (!$response) {
-          $body = curl_error($curl_Instance);
-          // HostNotFound, No route to Host, etc  Network related error
-          $http_status = -1;
-          Log::error("CURL Error: = " . $body);
-      } else {
-        //parsing http status code
-          $http_status = curl_getinfo($curl_Instance, CURLINFO_HTTP_CODE);
-
-          if (!is_null($header)) {
-              $header_size = curl_getinfo($curl_Instance, CURLINFO_HEADER_SIZE);
-              $header = substr($response, 0, $header_size);
-              $body = substr($response, $header_size);
-
-          } else {
-              $body = $response;
-          }
-      }
-
-      curl_close($curl_Instance);
-
-      return $body;
-  }
-
-  $APIFoodFetchURL = "https://localhost:5001/api/Food";
-
-  //$ret = Curl($APIFoodFetchURL, $http_status, $json);
-
-  //var_dump($ret);
 }
 
 ;?>
