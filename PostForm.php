@@ -69,6 +69,10 @@ if(isset($_POST["submitOrder"])){
         height: 100px;
       }
 
+      .error-label{
+        color:red;
+      }
+
     </style>
 </head>
 <body>
@@ -90,15 +94,17 @@ if(isset($_POST["submitOrder"])){
 
      <!--Enter Order Name Field -->
       <div class="form-group">
-        <label for="orderName">Enter Order Name:</label>
-        <input type="text"  name="orderName" class="form-control" id="orderName" placeholder="Order Name">
+        <label for="orderName">Enter Order Name: </label><label class="error-label">  </label>
+        <input type="text"  name="orderName" class="form-control formInput" id="orderName" placeholder="Order Name">
       </div>
 
 
         <!--Enter Food Item Field -->
       <div class="form-group">
-        <label for="menuItem">Menu Item</label>
-        <select class="form-control" id="menuItem"  name="menuItem">
+        <label for="menuItem">Menu Item: </label><label class="error-label">  </label>
+        <select class="form-control formInput" id="menuItem"  name="menuItem">
+
+        <option value="" disabled selected>Select an Option below</option>
 
         <!-- Populate Select Tag from GET REQUEST with Food Items -->
         <?php foreach ($GET_requestFoodData as $oneFoodItem):?>
@@ -113,17 +119,85 @@ if(isset($_POST["submitOrder"])){
 
       <!-- Enter numeric quantity field -->
       <div class="form-group">
-        <label for="quantity">Quantity:</label>
-        <input type="number"  name="quantity" class="form-control" id="quantity" placeholder="Quantity">
+        <label for="quantity">Quantity:  </label> <label class="error-label">  </label>
+        
+        <input type="number"   name="quantity" class="form-control formInput" id="quantity" placeholder="Quantity">
       </div>
 
 
       <!-- submit form button -->
 
-      <button name="submitOrder" type="submit" class="btn bg-dark text-white" style="width:100%;">Submit Order</button>
+      <button name="submitOrder" type="submit" class="btn bg-dark text-white submitOrderBtn" style="width:100%;">Submit Order</button>
 
     </form>
   </div>
 </body>
+
+
 </html>
 
+<script>
+
+        
+  let allErrorTags = document.querySelectorAll(".error-label") //all error tags
+  let allFormInput = document.querySelectorAll(".formInput") //all form inputs 
+  let submitOrderBtn = document.querySelector(".submitOrderBtn") //Submit button
+
+
+  //When Submit button is pressed
+  submitOrderBtn.addEventListener("click", (event)=>{
+
+    let doesFormErrorsExist = false; //clear all errors
+
+    //Clear all errors and check all for emptyness
+    allFormInput.forEach((oneInput)=>{
+
+      let errorTagOfInput = allErrorTags[Array.from(allFormInput).indexOf(oneInput)]
+      errorTagOfInput.innerHTML = ""
+
+      if((oneInput.value.length > 0) == false){
+
+        errorTagOfInput.innerHTML = "* This field is required"
+        doesFormErrorsExist = true;
+      }
+    });
+
+
+
+
+    //Order Name Validation
+    let orderNameInput = allFormInput[0]
+
+    if(orderNameInput.value.length > 20){
+
+      allErrorTags[0].innerHTML = "* Cannot Exceed 20 Chars"
+      doesFormErrorsExist = true;
+    }
+
+
+
+    //Quantity  Validation
+    let quantityInput = allFormInput[2]
+
+    if((parseInt(quantityInput.value) > 100) || (parseInt(quantityInput.value) <= 0)){
+
+      let errorTagOfInput = allErrorTags[Array.from(allFormInput).indexOf(quantityInput)]
+      errorTagOfInput.innerHTML = "*Must be a number between 1 - 100"
+
+      doesFormErrorsExist = true;
+    }
+
+
+    //Prevent Post event if errors are found
+    if(doesFormErrorsExist){
+
+      event.preventDefault();
+    }
+  })
+
+  
+
+
+  
+
+</script>
