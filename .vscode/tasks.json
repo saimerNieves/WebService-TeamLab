@@ -13,7 +13,7 @@
             "command": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
         },
         "args": [
-            "http://localhost:88/TeamAPI_Site/${relativeFile}"
+            "http://localhost:88/WEBSERVICE-TEAMLAB/${relativeFile}"
         ],
         "presentation": {
             "echo": false,
